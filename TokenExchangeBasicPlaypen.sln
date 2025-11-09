@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "token-exchanger", "token-ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenExchanger", "token-exchanger\TokenExchanger.csproj", "{1E0000A9-5CE9-4E70-BD82-D758DA319CB2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "product-api", "product-api", "{82F7E1ED-F6DE-8D37-0B0E-1D01CD133F39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductApi", "product-api\ProductApi.csproj", "{CBB63B83-2E87-4532-9830-D3EE1B0D4103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,11 +33,24 @@ Global
 		{1E0000A9-5CE9-4E70-BD82-D758DA319CB2}.Release|x64.Build.0 = Release|Any CPU
 		{1E0000A9-5CE9-4E70-BD82-D758DA319CB2}.Release|x86.ActiveCfg = Release|Any CPU
 		{1E0000A9-5CE9-4E70-BD82-D758DA319CB2}.Release|x86.Build.0 = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|x64.Build.0 = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Debug|x86.Build.0 = Debug|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|x64.ActiveCfg = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|x64.Build.0 = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|x86.ActiveCfg = Release|Any CPU
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1E0000A9-5CE9-4E70-BD82-D758DA319CB2} = {52B667E8-31E0-6536-52ED-66FEBD947207}
+		{CBB63B83-2E87-4532-9830-D3EE1B0D4103} = {82F7E1ED-F6DE-8D37-0B0E-1D01CD133F39}
 	EndGlobalSection
 EndGlobal

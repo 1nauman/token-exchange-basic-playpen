@@ -24,9 +24,9 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match:
-                            prefix: "/"
+                            prefix: "/api"
                           route:
-                            cluster: backend-service
+                            cluster: product_api_cluster
                 http_filters:
                   # Filter 1: Validate the External JWT
                   - name: envoy.filters.http.jwt_authn
@@ -116,15 +116,15 @@ static_resources:
                       address: token-exchanger
                       port_value: 8080
 
-    - name: backend-service
+    - name: product_api_cluster
       type: LOGICAL_DNS
       connect_timeout: 1s
       load_assignment:
-        cluster_name: backend-service
+        cluster_name: product_api_cluster
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: backend-service
-                      port_value: 80
+                      address: product-api
+                      port_value: 8080

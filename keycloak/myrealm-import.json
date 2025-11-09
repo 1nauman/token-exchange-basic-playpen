@@ -1,0 +1,30 @@
+{
+  "realm": "myrealm",
+  "enabled": true,
+  "sslRequired": "NONE",
+  "clients": [
+    {
+      "clientId": "my-web-app",
+      "name": "My Test Web Application",
+      "enabled": true,
+      "publicClient": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://jwt.io"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

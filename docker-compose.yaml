@@ -4,10 +4,17 @@ services:
     container_name: keycloak
     command: start-dev
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_PROXY=edge
+      - KC_HOSTNAME=localhost
+      - KC_PROXY_HEADERS=xforwarded
     ports:
       - "8080:8080"
+    volumes:
+      - ./keycloak/myrealm-import.json:/tmp/myrealm-import.json:ro
+      - ./keycloak/entrypoint.sh:/tmp/entrypoint.sh:ro
+    entrypoint: /tmp/entrypoint.sh
     networks:
       - my-network
 
@@ -18,6 +25,16 @@ services:
     container_name: token-exchanger
     volumes:
       - ./envoy/keys/private_key.pem:/app/private_key.pem:ro
+    networks:
+      - my-network
+        
+  product-api:
+    build:
+      context: ./product-api
+      dockerfile: Dockerfile
+    container_name: product-api
+    volumes:
+      - ./envoy/keys/public_key.pem:/app/public_key.pem:ro
     networks:
       - my-network
 
@@ -32,13 +49,7 @@ services:
     depends_on:
       - keycloak
       - token-exchanger
-      - backend-service
-    networks:
-      - my-network
-
-  backend-service:
-    image: kennethreitz/httpbin
-    container_name: backend-service
+      - product-api
     networks:
       - my-network
 
