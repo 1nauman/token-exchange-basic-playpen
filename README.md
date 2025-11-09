@@ -1,6 +1,6 @@
 # Token exchange in APIG playpen
 
-```meramaid
+```mermaid
 sequenceDiagram
     participant Client
     participant IdP
