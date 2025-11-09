@@ -65,10 +65,18 @@ token-exchange-playpen/
 
 ## Step-by-Step Setup Instructions
 
-*(This section remains largely the same, with minor updates for the new service)*
-
 ### Step 1: Generate Signing Keys
-*(No changes)*
+The API Gateway needs a private/public key pair to sign and validate the internal JWTs.
+
+1.  Navigate into the `envoy/keys` directory.
+2.  Run the following `openssl` commands:
+    ```bash
+    # Generate a 2048-bit RSA private key
+    openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+    # Extract the public key from the private key
+    openssl rsa -pubout -in private_key.pem -out public_key.pem
+    ```
 
 ### Step 2: Create the Project Files
 Create the directories and files for all services as developed in our conversation.
@@ -81,12 +89,39 @@ docker compose up --build --detach
 This will start a single instance of each service.
 
 ### Step 4: Configure Keycloak
-*(No changes to this section)*
+After the stack starts, you need to configure Keycloak.
+
+1.  **Access Keycloak:** Open your browser to `http://localhost:8080`. Log in with `admin` / `admin`.
+2.  **Create a Realm:**
+    *   Hover over "master" in the top-left and click **"Create Realm"**.
+    *   **Realm name:** `myrealm`
+    *   Click **Create**.
+3.  **Create a Client:**
+    *   Go to **Clients** and click **Create client**.
+    *   **Client ID:** `my-web-app`
+    *   Click **Next**.
+    *   **Client authentication:** Keep it `On`.
+    *   **Authentication flow:** Check the box for **Implicit flow**.
+    *   Click **Next**.
+    *   **Valid redirect URIs:** Enter `https://jwt.io` (This is a handy tool for decoding JWTs).
+    *   Click **Save**.
+4.  **Create a User:**
+    *   Go to **Users** and click **Create new user**.
+    *   **Username:** `testuser`
+    *   Click **Create**.
+    *   Go to the **Credentials** tab for the new user.
+    *   Click **Set password**, enter a password (e.g., `password`), and turn **Temporary** `Off`. Click **Save**.
 
 ## Usage and Verification
 
 ### Part 1: Get the External Token
-*(No changes to this section)*
+1.  **Open an Incognito Window** in your browser to ensure a clean session.
+2.  Navigate to the following URL. This simulates a client application redirecting a user to log in.
+    ```
+    http://localhost:8080/realms/myrealm/protocol/openid-connect/auth?client_id=my-web-app&response_type=token&scope=openid&redirect_uri=https://jwt.io
+    ```
+3.  Log in as `testuser` with the password you set.
+4.  You will be redirected to `jwt.io`. Copy the long **Encoded** token string.
 
 ### Part 2: Test the Aggregated Endpoint
 
@@ -113,6 +148,32 @@ This will start a single instance of each service.
     docker compose logs inventory-api
     ```
     You will see a log from the `bff-api` first, followed by logs from both downstream services, proving the orchestration worked.
+
+### Part 3: Test Scalability and Load Balancing
+Now, let's scale our `product-api` to see how the system handles load.
+
+1.  **Stop and restart the stack with scaling enabled.** Use the `--scale` flag to start 3 replicas of the `product-api`.
+    ```bash
+    docker compose up --build --detach --scale product-api=3
+    ```
+
+2.  **Call the API multiple times** to generate traffic.
+    ```bash
+    curl -H "Authorization: Bearer $EXTERNAL_TOKEN" http://localhost:9090/api/products/2
+    curl -H "Authorization: Bearer $EXTERNAL_TOKEN" http://localhost:9090/api/products/3
+    curl -H "Authorization: Bearer $EXTERNAL_TOKEN" http://localhost:9090/api/products/1
+    ```
+
+3.  **Check the aggregated logs** to see which container handled each request.
+    ```bash
+    docker compose logs product-api
+    ```
+    You will see output from different container hostnames, proving that Envoy is distributing the load.
+    ```
+    product-api-1  | ---> Request handled by container 'a1b2c3d4e5f6' for user: 'testuser'
+    product-api-3  | ---> Request handled by container 'c3d4e5f6a1b2' for user: 'testuser'
+    product-api-2  | ---> Request handled by container 'b2c3d4e5f6a1' for user: 'testuser'
+    ```
 
 ## Architectural Deep Dive
 
