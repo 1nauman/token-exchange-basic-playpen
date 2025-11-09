@@ -7,7 +7,6 @@ sequenceDiagram
     participant APIG
     participant MS
 
-    %% --- Part 1: Client Authentication (OIDC Flow) ---
     rect rgb(240, 240, 240)
         note over Client, IdP: Part 1: Client Authentication (OIDC)
         Client->>IdP: 1. Redirect to Login
@@ -16,7 +15,6 @@ sequenceDiagram
         IdP-->>Client: 4. Returns External JWT
     end
 
-    %% --- Part 2: API Request & Token Exchange ---
     rect rgb(230, 240, 250)
         note over Client, MS: Part 2: API Call with Token Exchange
         Client->>APIG: 5. API Request + External JWT<br>(Authorization: Bearer [external_token])
@@ -30,7 +28,6 @@ sequenceDiagram
         APIG->>MS: 10. Forward Request + Internal JWT<br>(Authorization: Bearer [internal_token])
     end
 
-    %% --- Part 3: Upstream Service Validation ---
     rect rgb(230, 250, 230)
         note over MS: Part 3: Upstream Validation
         MS->>MS: 11. Validate Internal JWT<br>(Uses internal public key - fast, offline)
