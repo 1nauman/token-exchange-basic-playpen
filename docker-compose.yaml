@@ -38,6 +38,16 @@ services:
       - ./envoy/keys/public_key.pem:/app/public_key.pem:ro
     networks:
       - my-network
+    depends_on:
+      - inventory-api
+        
+  inventory-api:
+    build:
+      context: ./inventory-api
+      dockerfile: Dockerfile
+    container_name: inventory-api
+    networks:
+      - my-network
 
   envoy:
     image: envoyproxy/envoy:v1.28.0
@@ -51,6 +61,7 @@ services:
       - keycloak
       - token-exchanger
       - product-api
+      - inventory-api
     networks:
       - my-network
 
