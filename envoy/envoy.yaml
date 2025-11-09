@@ -21,10 +21,14 @@ static_resources:
                   name: local_route
                   virtual_hosts:
                     - name: local_service
-                      domains: ["*"]
+                      domains: [ "*" ]
                       routes:
                         - match:
-                            prefix: "/api"
+                            prefix: "/api/products"
+                          route:
+                            cluster: bff_api_cluster
+                        - match:
+                            prefix: "/"
                           route:
                             cluster: product_api_cluster
                 http_filters:
@@ -70,18 +74,13 @@ static_resources:
                               - exact: "x-internal-jwt"
                       clear_route_cache: true
                   
-                  # Filter 3: The Lua filter performs the final header swap
+                  # Filter 3: This NEW Lua filter runs third, replacing the old one. ---
                   - name: envoy.filters.http.lua
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
-                      inline_code: |
-                        function envoy_on_request(request_handle)
-                          local internal_jwt = request_handle:headers():get("x-internal-jwt")
-                          if internal_jwt then
-                            request_handle:headers():replace("Authorization", "Bearer " .. internal_jwt)
-                            request_handle:headers():remove("x-internal-jwt")
-                          end
-                        end
+                      # This now points to the file inside the container
+                      default_source_code:
+                        filename: /etc/envoy/scripts/aggregator.lua
                   
                   # Filter 4: The router is always required at the end.
                   - name: envoy.filters.http.router
@@ -127,4 +126,30 @@ static_resources:
                   address:
                     socket_address:
                       address: product-api
+                      port_value: 8080
+
+    - name: inventory_api_cluster
+      type: LOGICAL_DNS
+      connect_timeout: 1s
+      load_assignment:
+        cluster_name: inventory_api_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: inventory-api
+                      port_value: 8080
+
+    - name: bff_api_cluster
+      type: LOGICAL_DNS
+      connect_timeout: 1s
+      load_assignment:
+        cluster_name: bff_api_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: bff-api
                       port_value: 8080

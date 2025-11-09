@@ -19,7 +19,7 @@ services:
       - my-network
 
   token-exchanger:
-    build: 
+    build:
       context: ./token-exchanger
       dockerfile: Dockerfile
     container_name: token-exchanger
@@ -27,7 +27,7 @@ services:
       - ./envoy/keys/private_key.pem:/app/private_key.pem:ro
     networks:
       - my-network
-        
+  
   product-api:
     build:
       context: ./product-api
@@ -38,9 +38,7 @@ services:
       - ./envoy/keys/public_key.pem:/app/public_key.pem:ro
     networks:
       - my-network
-    depends_on:
-      - inventory-api
-        
+  
   inventory-api:
     build:
       context: ./inventory-api
@@ -48,6 +46,19 @@ services:
     container_name: inventory-api
     networks:
       - my-network
+  
+  bff-api:
+    build:
+      context: ./bff-api
+      dockerfile: Dockerfile
+    container_name: bff-api
+    volumes:
+      - ./envoy/keys/public_key.pem:/app/public_key.pem:ro
+    networks:
+      - my-network
+    depends_on:
+      - product-api
+      - inventory-api
 
   envoy:
     image: envoyproxy/envoy:v1.28.0
@@ -57,11 +68,13 @@ services:
       - "9001:9001"    # Admin interface
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./envoy/scripts/aggregator.lua:/etc/envoy/scripts/aggregator.lua:ro
     depends_on:
       - keycloak
       - token-exchanger
       - product-api
       - inventory-api
+      - bff-api
     networks:
       - my-network
 
