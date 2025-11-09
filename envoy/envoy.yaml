@@ -24,6 +24,10 @@ static_resources:
                       domains: [ "*" ]
                       routes:
                         - match:
+                            prefix: "/api-go/products"
+                          route:
+                            cluster: bff_api_go_cluster
+                        - match:
                             prefix: "/api/products"
                           route:
                             cluster: bff_api_cluster
@@ -153,3 +157,15 @@ static_resources:
                     socket_address:
                       address: bff-api
                       port_value: 8080
+    - name: bff_api_go_cluster
+      type: LOGICAL_DNS
+      connect_timeout: 1s
+      load_assignment:
+        cluster_name: bff_api_go_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: bff-api-go
+                      port_value: 8081

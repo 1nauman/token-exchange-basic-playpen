@@ -50,12 +50,14 @@ sequenceDiagram
 *   **API Gateway (`APIG`):** Envoy Proxy
 *   **Token Exchange Service:** ASP.NET Minimal API
 *   **BFF Service:** ASP.NET Minimal API
+*   **BFF Service (Go):** Go
 *   **Upstream Microservices:** ASP.NET Minimal API (`product-api`, `inventory-api`)
 
 ### Final Directory Structure
 ```
 token-exchange-playpen/
 ├── bff-api/
+├── bff-api-go/
 ├── docker-compose.yml
 ├── envoy/
 ├── inventory-api/
@@ -149,7 +151,22 @@ After the stack starts, you need to configure Keycloak.
     ```
     You will see a log from the `bff-api` first, followed by logs from both downstream services, proving the orchestration worked.
 
-### Part 3: Test Scalability and Load Balancing
+### Part 3: Test the Go BFF Endpoint
+To demonstrate the polyglot nature of the architecture, you can call the same endpoint on the Go BFF.
+
+1.  Call the protected endpoint through the Envoy gateway, this time using the `/api-go` route.
+    ```bash
+    curl -H "Authorization: Bearer $EXTERNAL_TOKEN" http://localhost:9090/api-go/products/1
+    ```
+
+2.  **Check the Output:** You should see the exact same successful, aggregated JSON response as the .NET BFF.
+
+3.  **Verify the Flow:** Check the logs of the Go BFF to see the chain of calls.
+    ```bash
+    docker compose logs bff-api-go
+    ```
+
+### Part 4: Test Scalability and Load Balancing
 Now, let's scale our `product-api` to see how the system handles load.
 
 1.  **Stop and restart the stack with scaling enabled.** Use the `--scale` flag to start 3 replicas of the `product-api`.
@@ -184,6 +201,9 @@ In this architecture, we use a dedicated **BFF service** to handle complex orche
 *   **Keeps the Gateway Simple:** The API Gateway (Envoy) focuses on cross-cutting concerns like security, routing, and rate-limiting. It does not contain complex business logic.
 *   **Developer Experience:** The complex aggregation logic is written in C#, a full-featured language with excellent tooling for debugging and testing. This is far more maintainable than embedding complex logic in Envoy's configuration or scripts.
 *   **API Composition:** The BFF aggregates data by calling the public APIs of other services, not by accessing their databases directly. This respects microservice boundaries and ensures that each service remains the single source of truth for its data.
+
+### Polyglot Services (Go and .NET)
+This project includes two BFF implementations—one in ASP.NET and one in Go—to demonstrate the language-agnostic nature of a well-designed microservices architecture. As long as each service adheres to the public contract (in this case, HTTP APIs and JWTs), the underlying implementation language doesn't matter. This allows teams to choose the best tool for the job for each service.
 
 ### How Envoy Achieves Load Balancing
 
