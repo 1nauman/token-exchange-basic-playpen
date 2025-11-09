@@ -7,6 +7,8 @@
       "clientId": "my-web-app",
       "name": "My Test Web Application",
       "enabled": true,
+      "implicitFlowEnabled": true,
+      "standardFlowEnabled": true,
       "publicClient": true,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
@@ -18,6 +20,9 @@
     {
       "username": "testuser",
       "enabled": true,
+      "email": "testuser@myrealm.com",
+      "firstName": "Test",
+      "lastName": "User",
       "credentials": [
         {
           "type": "password",
