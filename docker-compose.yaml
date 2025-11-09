@@ -1,0 +1,47 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+
+  token-exchanger:
+    build: 
+      context: ./token-exchanger
+      dockerfile: Dockerfile
+    container_name: token-exchanger
+    volumes:
+      - ./envoy/keys/private_key.pem:/app/private_key.pem:ro
+    networks:
+      - my-network
+
+  envoy:
+    image: envoyproxy/envoy:v1.28.0
+    container_name: envoy
+    ports:
+      - "9090:9090"    # Public traffic
+      - "9001:9001"    # Admin interface
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - keycloak
+      - token-exchanger
+      - backend-service
+    networks:
+      - my-network
+
+  backend-service:
+    image: kennethreitz/httpbin
+    container_name: backend-service
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
