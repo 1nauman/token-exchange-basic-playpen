@@ -43,7 +43,9 @@ var products = new List<Product>
 app.MapGet("/api/products/{id}", (int id, HttpContext context) =>
     {
         var userName = context.User.FindFirstValue("preferred_username") ?? "Unknown User";
-        Console.WriteLine($"---> Request for product {id} received from user: '{userName}'");
+        
+        var hostName = System.Net.Dns.GetHostName();
+        Console.WriteLine($"---> Request handled by container '{hostName}' for user: '{userName}'");
 
         var product = products.FirstOrDefault(p => p.Id == id);
 

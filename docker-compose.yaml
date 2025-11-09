@@ -32,7 +32,8 @@ services:
     build:
       context: ./product-api
       dockerfile: Dockerfile
-    container_name: product-api
+    #Disable container name for scaling
+    #container_name: product-api
     volumes:
       - ./envoy/keys/public_key.pem:/app/public_key.pem:ro
     networks:
