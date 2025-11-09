@@ -74,7 +74,7 @@ services:
       - inventory-api
 
   envoy:
-    image: envoyproxy/envoy:v1.28.0
+    image: envoyproxy/envoy:v1.36.2
     container_name: envoy
     ports:
       - "9090:9090"    # Public traffic
